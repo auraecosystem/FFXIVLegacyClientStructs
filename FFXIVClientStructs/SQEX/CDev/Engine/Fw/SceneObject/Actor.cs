@@ -3,37 +3,126 @@ using FFXIVClientStructs.Attributes;
 
 namespace FFXIVClientStructs.SQEX.CDev.Engine.Fw.SceneObject;
 
-// SQEX::CDev::Engine::Fw::SceneObject::Actor
-// Base class for all scene actors in Crystal Tools
-// Vtable: 0x0109CA94 (89 virtual methods)
-// Init:   0x00A60620
-// RTTI:   .?AVActor@SceneObject@Fw@Engine@CDev@SQEX@@
-//
-// Actor uses ESI as this-ptr in ctor. Accesses [esi+0x48] for a sub-object pointer.
-// Init sequence checks [esi+0x48]!=NULL, calls vt[0x34] (index 13), constructs
-// sub-objects via Controller pattern.
-//
-// 89 virtual methods form the base for ALL game actors:
-//   vt[0]  = dtor (per-class)
-//   vt[1]  = 0x006207D0 (shared)
-//   vt[2]  = 0x006204F0 (shared)
-//   vt[3]  = 0x00620590 (shared)
-//   vt[4]  = 0x00620640 (shared)
-//   vt[5]  = 0x00620700 (shared)
-//   vt[6]  = 0x00620880 (shared)
-//   vt[7]  = per-class (init/update?)
-//   vt[8]  = 0x00620940 (shared)
-//   vt[9]  = 0x00621430 (shared)
-//   vt[10] = 0x00621460 (shared)
-//   vt[11] = per-class
-//   vt[12] = 0x00776340 (shared across ALL actors)
-//   vt[13] = 0x00A602A0 (shared across ALL actors)
+// Crystal Tools Fw::SceneObject — Concrete implementations of the
+// ISceneObject interfaces. Actor is the base for all scene actors;
+// Controllers, DrawLayer, Camera, Motion, etc. are sub-components.
+
 [Rtti(".?AVActor@SceneObject@Fw@Engine@CDev@SQEX@@")]
 [StructLayout(LayoutKind.Explicit, Size = 0x100)]
 public unsafe struct Actor
 {
-    [FieldOffset(0x00)] public nint VTable;
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109CA94 (89 vfuncs)
+    [FieldOffset(0x0048)] public nint SubObject;
+}
 
-    // Known field from ctor analysis: sub-object pointer at +0x48
-    [FieldOffset(0x48)] public nint SubObject;
+[Rtti(".?AVCameraContainer@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct CameraContainer
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109C8AC (17 vfuncs)
+}
+
+// Controllers:: sub-namespace types
+
+// Inherits: IScheduleObject
+[Rtti(".?AVAccObject@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x20)]
+public unsafe struct AccObject
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109D57C (39 vfuncs)
+}
+
+[Rtti(".?AVBGLayoutController@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x08)]
+public unsafe struct BGLayoutController
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109C85C (2 vfuncs)
+}
+
+[Rtti(".?AVMccObject@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x20)]
+public unsafe struct MccObject
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109D4BC (47 vfuncs)
+}
+
+[Rtti(".?AVMccParameter@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x08)]
+public unsafe struct MccParameter
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x01033644 (9 vfuncs)
+}
+
+[Rtti(".?AVPhysicsController@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x20)]
+public unsafe struct PhysicsController
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109DE84 (18 vfuncs)
+}
+
+[Rtti(".?AVSoundController@Controllers@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct SoundController
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109E6A0 (6 vfuncs)
+}
+
+// DrawLayer:: sub-namespace types
+
+[Rtti(".?AVDrawLayerManager@DrawLayer@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct DrawLayerManager
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x00FB6E38 (11 vfuncs)
+}
+
+// Top-level SceneObject types
+
+[Rtti(".?AVIModelObjectFactory@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x04)]
+public unsafe struct IModelObjectFactory
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x00FEA4BC (2 vfuncs)
+}
+
+[Rtti(".?AVMatrixCamera@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct MatrixCamera
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109DCE8 (12 vfuncs)
+}
+
+[Rtti(".?AVModelObjectContainer@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct ModelObjectContainer
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109E74C (5 vfuncs)
+}
+
+[Rtti(".?AVMotionController@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x20)]
+public unsafe struct MotionController
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109E464 (32 vfuncs)
+}
+
+[Rtti(".?AVMotionLayerController@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct MotionLayerController
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109E2DC (23 vfuncs)
+}
+
+[Rtti(".?AVRSGAdapter@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x04)]
+public unsafe struct RSGAdapter
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109CC14 (2 vfuncs)
+}
+
+[Rtti(".?AVVfxContainer@SceneObject@Fw@Engine@CDev@SQEX@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct VfxContainer
+{
+    [FieldOffset(0x0000)] public nint VTable; // 0x0109DD80 (6 vfuncs)
 }
