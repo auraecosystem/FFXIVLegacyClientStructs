@@ -46,6 +46,21 @@ Explicit-layout structs mapping game memory, organized to mirror the original C+
 | `GameManagerActor` | ~0x600 | 0x00FB8134 | 164 | Central manager. PostEffectController, inherits TargetActor |
 | `Actor` (base) | ~0x100 | 0x0109CA94 | 89 | Base for all scene actors |
 | `BootupActor` | — | 0x00FB86C4 | 164 | Boot/login sequence manager |
+| `SocketBase` | 0x1A4 (420 bytes) | 0x011132DC | 18 | WinSock2 abstraction. Mutex, ring buffers, stats counters, endpoint info |
+| `RUDPImpl` | ~0x300 | 0x01113378 | 14 | RUDP2 state machine. Retransmission, selective ACK, keepalive |
+
+### Network Architecture
+Three IPC channels, each with its own connection manager, packet builder, socket thread, and buffer infrastructure:
+
+| Channel | Opcodes | Purpose |
+|---|---|---|
+| **ZoneProtoChannel** | 199 | Game world: movement, combat, inventory, NPCs, status effects |
+| **LobbyProtoChannel** | 14 | Login: auth, character list/create/delete, world entry. Has crypto engine |
+| **ChatProtoChannel** | 10 | Chat: say, shout, tell, party, linkshell, system messages |
+
+Transport stack: `SocketBase → SocketWinsock → SocketImpl → RUDPSocket → RUDP2::RUDPImpl`
+
+RUDP2 segment types: SYN, ACK, DAT, EAK (selective ack), NUL (keepalive), RST (reset) — follows RFC 908/1151 naming.
 
 ### Lua Script API (166 bindings)
 Complete extraction of the Lua-exposed client API, including:
@@ -137,7 +152,9 @@ FFXIVClientStructs/
   Interop/            SignatureScanner, Memory, Pointer<T>, GameInfo
   STD/                MSVC x86 std::string, std::vector, std::map
   SQEX/CDev/Engine/   Crystal Tools engine subsystems
-  FFXIV/Application/  Game-layer structs (actors, network, Lua, UI)
+  FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI)
+  FFXIV/Component/    IPC channel base framework (NetBuffer, ConnectionManager)
+  Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller)
   Sqwt/               UI framework types
   Tools/              RttiDumper, ImportTableDumper, StructAnalyzer, VtableAnalyzer, StringExtractor
 
