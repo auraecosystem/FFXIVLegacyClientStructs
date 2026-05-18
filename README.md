@@ -74,14 +74,23 @@ Server-side field names from [Project Meteor](https://bitbucket.org/Ioncannon/pr
 - **Wire format** — BasePacket (0x10) → SubPacket (0x10) → GameMessage (0x10, opcode at +0x02)
 
 ### Lua Script API (166 bindings)
-Complete extraction of the Lua-exposed client API, including:
-- Character data: `_getPosition`, `_getDirection`, `_getOrientation`, `_getActorMainStat`, `_getDisplayName`
-- Stats: `_getSubStatWaste/Guard/Chant/Object/Breakage/MotionPack/Status`
-- Targeting: `_getTargetCharacter`, `_getLookAtCharacter`, `_getLastAttacker`
-- Inventory: `_getItem`, `_getEquippingItem`, `_getCatalogID`, `_isStackable`, `_isRare`
-- Party: `_getMember`, `_countMember`, `_getMemberLocation`
-- World: `_getServerTime`, `_getHydaelynHour/Day/Time/Moon`, `_getRegion`, `_getZoneName`
-- UI: Widget tree traversal, keyboard focus, container management
+Complete extraction of the Lua-exposed client API. 242 RTTI classes under `Application::Lua::Script`, with 109 bindings mapped to exact registration addresses in the 0x00749900–0x00757100 range. Organized into 13 categories:
+
+| Category | Count | Address Range | Key Functions |
+|---|---|---|---|
+| World/Zone | 9 | 0x7499D9–0x74A459 | `_getRegion`, `_getZoneName`, `_canRideChocobo`, `_isInn` |
+| Character/Actor | 22 | 0x74A5A9–0x74C289 | `_getPosition`, `_getDirection`, `_getActorMainStat`, `_getSubStat*` |
+| Party/Group | 12 | 0x74C529–0x74D789 | `_getMember`, `_countMember`, `_getMemberLocation` |
+| Items/Inventory | 21 | 0x74DB79–0x7561D9 | `_getItem`, `_getCatalogID`, `_isStackable`, `_isRare` |
+| Grand Company | 4 | 0x74F319–0x74F709 | `_getGMRank`, `_getBelongGrandCompany` |
+| Interaction | 9 | 0x74F8F9–0x750B59 | `_play`, `_isTalkable`, `_isEmotable`, `_isPushable` |
+| UI/Widgets | 7 | 0x750F49–0x757049 | `_getParentWidget`, `_getChildWidget`, `_setKeyboardFocusedWidget` |
+| Target/Cursor | 5 | 0x751339–0x7521A9 | `_getTargetCharacter`, `_getLookAtCharacter`, `_getLastAttacker` |
+| Config/Macro | 5 | 0x751B19–0x752059 | `_getUserConfig`, `_parseTextCommand`, `_getUserMacro*` |
+| Player/Time | 12 | 0x752839–0x753B29 | `_getMyPlayer`, `_getServerTime`, `_getHydaelynHour/Day/Time/Moon` |
+| Nameplate | 3 | 0x72E979–0x72EC19 | `_setNameplateIcon/Gauge/Visible` |
+
+Engine infrastructure: GameEngine (ErrorHandler 68 vfuncs, SharedWorkInterface 28 vfuncs, StackOperator 9 vfuncs), 11 Work::Information types (29 vfuncs each), Memory subsystem (Container 20 vfuncs, Operator 16 vfuncs), 50+ Command::Network packet receivers, 9 Item command types.
 
 ### Analysis Tools
 
