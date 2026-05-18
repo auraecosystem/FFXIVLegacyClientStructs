@@ -4,40 +4,77 @@ namespace FFXIVClientStructs.FFXIV.Application.Network;
 
 // ============================================================================
 // Wire format structures — shared framing for all three IPC channels.
-// Cross-referenced from Project Meteor packet implementation.
+// Cross-referenced from Project Meteor: BasePacket.cs, SubPacket.cs.
 //
 // Transport stack: BasePacket → SubPacket[] → GameMessage (per-channel payload)
+//
+// PM constants:
+//   BASEPACKET_SIZE  = 0x10 (16 bytes)
+//   SUBPACKET_SIZE   = 0x10 (16 bytes)
+//   GAMEMESSAGE_SIZE = 0x10 (16 bytes)
+//   BUFFER_SIZE      = 0xFFFF (65535 bytes per-socket receive buffer)
+//
+// Encryption: Lobby channel uses Blowfish (16 rounds, 18-entry P-array, 4×256 S-boxes).
+// Blowfish encrypts SubPacket data only (skips both headers). Key derived from
+// SecurityHandshakePacket: ticketPhrase (0x40 bytes @ +0x34) + clientNumber (uint32).
 // ============================================================================
+
+// BasePacket connection type discriminator.
+public enum ConnectionType : ushort
+{
+    Zone = 1, // TYPE_ZONE — map/zone server channel
+    Chat = 2, // TYPE_CHAT — chat/world server channel
+}
+
+// SubPacket type discriminator — determines payload interpretation.
+public enum SubPacketType : ushort
+{
+    SessionInit = 0x01,  // Hello/handshake (world server login, carries sessionId @ +0x14)
+    Control0x02 = 0x02,  // Control response (fixed 0x28 bytes)
+    GameMessage = 0x03,  // Opcode-dispatched game message (has GameMessageHeader)
+    ServerPing = 0x07,   // Server keepalive ping (8 bytes: actorId + timestamp)
+    ClientPong = 0x08,   // Client keepalive response (8 bytes: sessionId + timestamp)
+    // >= 0x1000: World/inter-server routing (SessionBegin=0x1000, SessionEnd=0x1001, etc.)
+}
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public struct BasePacketHeader
 {
-    [FieldOffset(0x00)] public byte IsAuthenticated;
-    [FieldOffset(0x01)] public byte IsCompressed;
-    [FieldOffset(0x02)] public ushort ConnectionType;
-    [FieldOffset(0x04)] public ushort PacketSize;
+    [FieldOffset(0x00)] public byte IsAuthenticated; // 1 = Blowfish-encrypted, 0 = plaintext
+    [FieldOffset(0x01)] public byte IsCompressed;    // 1 = zlib compressed, 0 = raw
+    [FieldOffset(0x02)] public ushort ConnectionType; // see ConnectionType enum
+    [FieldOffset(0x04)] public ushort PacketSize;     // total bytes including this header
     [FieldOffset(0x06)] public ushort NumSubPackets;
-    [FieldOffset(0x08)] public ulong Timestamp; // milliseconds since epoch
+    [FieldOffset(0x08)] public ulong Timestamp;       // milliseconds since epoch (UTC)
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public struct SubPacketHeader
 {
-    [FieldOffset(0x00)] public ushort SubPacketSize;
-    [FieldOffset(0x02)] public ushort Type; // 0x03 = GameMessage, 0x07 = KeepAlive, etc.
-    [FieldOffset(0x04)] public uint SourceId;
-    [FieldOffset(0x08)] public uint TargetId;
-    [FieldOffset(0x0C)] public uint Unknown0C;
+    [FieldOffset(0x00)] public ushort SubPacketSize; // total bytes including this header
+    [FieldOffset(0x02)] public ushort Type;          // see SubPacketType enum
+    [FieldOffset(0x04)] public uint SourceId;        // actor/character ID (sender)
+    [FieldOffset(0x08)] public uint TargetId;        // session ID (recipient)
+    [FieldOffset(0x0C)] public uint Unknown0C;       // always 0x00
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public struct GameMessageHeader
 {
-    [FieldOffset(0x00)] public ushort Unknown00;
-    [FieldOffset(0x02)] public ushort Opcode;
-    [FieldOffset(0x04)] public uint Unknown04;
-    [FieldOffset(0x08)] public uint Timestamp;
-    [FieldOffset(0x0C)] public uint Unknown0C;
+    [FieldOffset(0x00)] public ushort Unknown00; // always 0x14
+    [FieldOffset(0x02)] public ushort Opcode;    // see ZoneOpcode / LobbyOpcode enums
+    [FieldOffset(0x04)] public uint Unknown04;   // always 0x00
+    [FieldOffset(0x08)] public uint Timestamp;   // unix timestamp (seconds)
+    [FieldOffset(0x0C)] public uint Unknown0C;   // always 0x00
+}
+
+// PM magic actor IDs used as sourceId in server-originated packets.
+public static class PacketConstants
+{
+    public const uint LobbyServerActorId = 0xE0006868;
+    public const uint PingActorId = 0x0E016EE5;
+    public const int BufferSize = 0xFFFF; // 65535 bytes per-socket receive buffer
+    public const int LobbyPort = 54994;   // FFXIV_LOBBY_PORT
 }
 
 // ============================================================================
@@ -186,7 +223,7 @@ public enum ZoneOpcode : ushort
     SetPlayerDream = 0x01A7,
 }
 
-// Lobby server packet opcodes (server→client).
+// Lobby server→client packet opcodes.
 // Maps 1:1 with LobbyProtoDownCallback's 14 vfunc dispatch table.
 public enum LobbyOpcode : ushort
 {
@@ -194,10 +231,20 @@ public enum LobbyOpcode : ushort
     ServiceLoginReply = 0x0007,
     LobbyLoginReply = 0x0008,
     CharacterList = 0x000D,
-    WorldList = 0x0015,
     GameLoginReply = 0x000E,
     CharaMakeReply = 0x000F,
     ImportList = 0x0010,
     RetainerList = 0x0011,
     VersionInfo = 0x0012,
+    WorldList = 0x0015,
+}
+
+// Lobby client→server packet opcodes.
+// Sent via LobbyClientPacketBuilder.
+public enum LobbyClientOpcode : ushort
+{
+    GetCharacters = 0x03,
+    SelectCharacter = 0x04,
+    SessionAcknowledgement = 0x05,
+    ModifyCharacter = 0x0B,
 }
