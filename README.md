@@ -34,7 +34,7 @@ Top-level namespaces:
 - `Application::Lua::Script` (242) — Lua scripting bindings (166 documented Lua API functions)
 - `Application::Main::Element` (221) — UI elements and HUD
 - `Application::Network` (300+) — Three IPC channels: Zone, Lobby, Chat (each with packet builders and connection managers)
-- `Sqwt` (250+) — Full WPF-inspired UI framework with XAML markup, data binding, templates, commands
+- `Sqwt` (685 classes) — Full WPF-inspired UI framework with XAML markup, data binding, templates, routed events, animations, dependency properties, visual tree, input system, document model
 
 ### C# Struct Library
 Explicit-layout structs mapping game memory, organized to mirror the original C++ namespace hierarchy. Key structs with confirmed data from RE:
@@ -51,6 +51,26 @@ Explicit-layout structs mapping game memory, organized to mirror the original C+
 | `Actor` (base) | ~0x100 | 0x0109CA94 | 89 | Base for all scene actors |
 | `SocketBase` | 0x1A4 (420 bytes) | 0x011132DC | 18 | WinSock2 abstraction. Mutex, ring buffers, stats counters, endpoint info |
 | `RUDPImpl` | ~0x300 | 0x01113378 | 14 | RUDP2 state machine. Retransmission, selective ACK, keepalive |
+
+### Sqwt UI Framework (685 RTTI classes)
+Square Enix Widget Toolkit — a full WPF-inspired UI framework used for all of FFXIV 1.0's interface: character creation, HUD, menus, chat, config, map screen, nameplate overlays, and login screens.
+
+**Core hierarchy** mirrors WPF: `Object → DependencyObject → Visual → UIElement → FrameworkElement → Control → ...`
+
+| Subsystem | Struct Count | Key Types |
+|---|---|---|
+| **Core** | 20+ | AllocatorBase, DependencyObject, DependencyPropertyInfoBase, ControlTemplate, DataTemplate, Style, TriggerBase, Trigger, Setter, EventArgs, Delegate |
+| **Visual Tree** | 10+ | Visual (23 vfuncs), UIElement (39), FrameworkElement (65), Window (79), InputElement (72), Brush, SolidColorBrush, Transform, DrawingContext (44), Matrix |
+| **Controls** | 35+ | Control (70), ContentControl (71), Button (73), CheckBox (76), ComboBox (72), TabControl (72), Panel (68), StackPanel, Canvas, Border, Image, ProgressBar (73), ScrollContentPresenter, TextChangedEventArgs |
+| **Controls::Primitives** | 15+ | ToggleButton (76), RepeatButton (73), Selector (72), ScrollBar (73), TextBoxBase (94 — largest), Thumb (71), Track (67), Popup (65), BulletDecorator, IScrollInfo (31) |
+| **Input** | 30+ | InputDevice, KeyboardDevice (7), Mouse, Keyboard, InputGesture (11), KeyGesture, MouseGesture, PadGesture, CharGesture, ICommand (4), NullCommand, CommandBinding, Cursor (65), Anchor (65), MouseElement |
+| **Animation** | 15+ | Animatable (14), TimelineGroup (24), ParallelTimeline (24), Storyboard (24), AnimationTimeline (24), DoubleAnimation (24), BeginStoryboard, PauseStoryboard, ResumeStoryboard, StopStoryboard, StringKeyFrame |
+| **Markup (XAML)** | 80+ | ConfigurationFactor (8), ControlCreateBase (9), XamlReader, XamlReaderAsync, 40+ MarkupObject types, 30+ ConfigurationFactor-derived factories |
+| **Data** | 5+ | BindingBase (4), Binding (6), IValueConverter (18), SqwtXmlDataMaker (17), XmlAttr (10) |
+| **DocumentModel** | 8+ | TextDocument (23), Element (5), LineTextDocument, WrapTextDocument, LineTextElement, WrapTextElement |
+| **Threading** | 4 | Mutex, Thread (4), Timer, ParameterizedThreadStartBase |
+| **Xml** | 3 | XmlDocument (3), XmlElemenBase (8), XmlElement (3) |
+| **Utility** | 5 | EditorControler, File, WidgetParts, WidgetPartsActual, WidgetPartsRefference |
 
 ### Network Architecture
 Three IPC channels, each with its own connection manager, packet builder, socket thread, and buffer infrastructure:
@@ -178,7 +198,18 @@ FFXIVClientStructs/
   FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI, game enums)
   FFXIV/Component/    IPC channel base framework (NetBuffer, ConnectionManager)
   Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller)
-  Sqwt/               UI framework types
+  Sqwt/               UI framework (685 classes)
+    SqwtCore.cs        Core types, templates, triggers, dependency properties
+    Visual.cs          Visual tree, UIElement, FrameworkElement, Window, Media types
+    Controls/          Controls (35+) and Primitives (15+)
+    Input/             Input devices, gestures, commands, bindings, visual overlays
+    Media/             Animation system (timelines, storyboards)
+    Markup/            XAML parsing, control factories, markup objects (80+)
+    Data/              Data binding, value converters
+    DocumentModel/     Text document model for TextBox/LogControl
+    Threading/         Mutex, Thread, Timer
+    Xml/               XML DOM wrappers
+    Utility/           Editor and widget helpers
   Tools/              RttiDumper, ImportTableDumper, StructAnalyzer, VtableAnalyzer, StringExtractor
 
 FFXIVClientStructs.Tools.CLI/
