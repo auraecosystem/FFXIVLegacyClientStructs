@@ -43,9 +43,12 @@ Explicit-layout structs mapping game memory, organized to mirror the original C+
 |---|---|---|---|---|
 | `CharaActor` | 0x2BB0 (11,184 bytes) | 0x00FC0D34 | 188 | Player/NPC/enemy actor. 40 embedded sub-objects including CharaActionController, CutSceneManager, OcclusionBoundary, 2x TargetInfo |
 | `CharaElement` | 0xEF0 (3,824 bytes) | 0x00FA7C50 | 14 | Character UI element |
-| `GameManagerActor` | ~0x600 | 0x00FB8134 | 164 | Central manager. PostEffectController, inherits TargetActor |
+| `TargetActor` | ~0x09C0 | 0x00FB83CC | 160 | Base for system actors. 79 fields, 16 sub-objects, 37-entry property array at +0x0914 |
+| `GameManagerActor` | ~0x09C0 | 0x00FB8134 | 164 | Central manager. PostEffectController (15 screen-space filters), inherits TargetActor |
+| `BootupActor` | ~0x09C0 | 0x00FB86C4 | 164 | Boot/login sequence. Near-identical to TargetActor, inherits through CDevActor |
+| `CameraActor` | ~0x400 | 0x00FB906C | 164 | Camera manager. 11 context types (FPS/TPS/WoW/CharaCreate/CharaFocus/CharaSelect) |
+| `PostEffectController` | ~0x410 | 0x00FB7DC8 | 3 | 15 PostFilterBase-derived filters: Blur, ColorCorrection, CrossFade, DoF, Fog, Gamma, Glare, Latitude, LUT, PlaneFade, Shadow, SSAO, TargetEffect ×3, VolLight |
 | `Actor` (base) | ~0x100 | 0x0109CA94 | 89 | Base for all scene actors |
-| `BootupActor` | — | 0x00FB86C4 | 164 | Boot/login sequence manager |
 | `SocketBase` | 0x1A4 (420 bytes) | 0x011132DC | 18 | WinSock2 abstraction. Mutex, ring buffers, stats counters, endpoint info |
 | `RUDPImpl` | ~0x300 | 0x01113378 | 14 | RUDP2 state machine. Retransmission, selective ACK, keepalive |
 
