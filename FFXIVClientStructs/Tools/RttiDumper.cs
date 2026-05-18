@@ -22,7 +22,8 @@ public static class RttiDumper
         uint? CompleteObjectLocatorVA,
         uint? VTableVA,
         uint? FirstVtableEntry,
-        int? VtableEntryCount);
+        int? VtableEntryCount,
+        List<string>? BaseClasses = null);
 
     public static List<RttiEntry> ExtractAll(string exePath)
     {
@@ -95,7 +96,44 @@ public static class RttiDumper
                 }
             }
 
-            results.Add(new RttiEntry(mangledName, demangled, tdVA, colVA, vtVA, firstEntry, vtCount));
+            List<string>? baseClasses = null;
+            if (colVA.HasValue)
+            {
+                var colFileOff = (int)(colVA.Value - ImageBase);
+                var chdVA = BitConverter.ToUInt32(bytes, colFileOff + 16);
+                if (chdVA >= ImageBase && chdVA < ImageBase + (uint)bytes.Length)
+                {
+                    var chdFileOff = (int)(chdVA - ImageBase);
+                    var numBases = BitConverter.ToInt32(bytes, chdFileOff + 8);
+                    var bcaVA = BitConverter.ToUInt32(bytes, chdFileOff + 12);
+
+                    if (numBases is > 0 and < 100 && bcaVA >= ImageBase && bcaVA < ImageBase + (uint)bytes.Length)
+                    {
+                        baseClasses = new List<string>();
+                        var bcaFileOff = (int)(bcaVA - ImageBase);
+                        for (var b = 1; b < numBases; b++)
+                        {
+                            var bcdVA = BitConverter.ToUInt32(bytes, bcaFileOff + (b * 4));
+                            if (bcdVA < ImageBase || bcdVA >= ImageBase + (uint)bytes.Length) continue;
+                            var bcdFileOff = (int)(bcdVA - ImageBase);
+                            var baseTdVA = BitConverter.ToUInt32(bytes, bcdFileOff);
+                            if (baseTdVA < ImageBase || baseTdVA >= ImageBase + (uint)bytes.Length) continue;
+                            var baseTdFileOff = (int)(baseTdVA - ImageBase);
+                            var baseTdNameOff = baseTdFileOff + 8;
+                            if (baseTdNameOff < bytes.Length)
+                            {
+                                var nameEnd = baseTdNameOff;
+                                while (nameEnd < bytes.Length && bytes[nameEnd] != 0) nameEnd++;
+                                var baseName = Encoding.ASCII.GetString(bytes, baseTdNameOff, nameEnd - baseTdNameOff);
+                                if (baseName.StartsWith(".?AV"))
+                                    baseClasses.Add(Demangle(baseName));
+                            }
+                        }
+                    }
+                }
+            }
+
+            results.Add(new RttiEntry(mangledName, demangled, tdVA, colVA, vtVA, firstEntry, vtCount, baseClasses));
             idx = end;
         }
 
@@ -104,12 +142,54 @@ public static class RttiDumper
 
     public static string Demangle(string mangled)
     {
-        // Strip .?AV prefix and trailing @@
         var name = mangled;
         if (name.StartsWith(".?AV")) name = name[4..];
+        else if (name.StartsWith(".?AU")) name = name[4..]; // struct tag
         if (name.EndsWith("@@")) name = name[..^2];
 
-        // Split by @ and reverse to get C++ namespace::class
+        // Handle template instantiations: V?$ClassName@VParam@ns@@@ns@@
+        if (name.StartsWith("?$"))
+        {
+            name = name[2..];
+            var atIdx = name.IndexOf('@');
+            if (atIdx > 0)
+            {
+                var templateName = name[..atIdx];
+                var rest = name[(atIdx + 1)..];
+                var templateParams = new List<string>();
+                var outerParts = new List<string>();
+                var depth = 0;
+                var current = new StringBuilder();
+
+                foreach (var c in rest)
+                {
+                    if (c == '@')
+                    {
+                        if (current.Length > 0)
+                        {
+                            if (current.ToString().StartsWith("V") || current.ToString().StartsWith("U"))
+                            {
+                                if (depth == 0)
+                                    templateParams.Add(current.ToString()[1..]);
+                                else
+                                    outerParts.Add(current.ToString());
+                            }
+                            else
+                                outerParts.Add(current.ToString());
+                            current.Clear();
+                        }
+                    }
+                    else
+                        current.Append(c);
+                }
+
+                outerParts.Reverse();
+                var ns = outerParts.Count > 0 ? string.Join("::", outerParts) + "::" : "";
+                var tparams = templateParams.Count > 0 ? $"<{string.Join(", ", templateParams)}>" : "";
+                return $"{ns}{templateName}{tparams}";
+            }
+        }
+
         var parts = name.Split('@', StringSplitOptions.RemoveEmptyEntries);
         Array.Reverse(parts);
         return string.Join("::", parts);
@@ -133,6 +213,53 @@ public static class RttiDumper
             var count = e.VtableEntryCount.HasValue ? $"{e.VtableEntryCount.Value,3}" : "   ";
             writer.WriteLine($"{e.DemangledName,-90} | {vt} | {count} | 0x{e.TypeDescriptorVA:X8} | {e.MangledName}");
         }
+    }
+
+    public static void DumpHierarchy(string exePath, string className, TextWriter writer)
+    {
+        var entries = ExtractAll(exePath);
+        var entry = entries.FirstOrDefault(e =>
+            e.DemangledName.Contains(className, StringComparison.OrdinalIgnoreCase));
+
+        if (entry == null)
+            throw new InvalidOperationException($"Class '{className}' not found in RTTI");
+
+        writer.WriteLine($"// Inheritance hierarchy for: {entry.DemangledName}");
+        writer.WriteLine();
+
+        if (entry.BaseClasses != null && entry.BaseClasses.Count > 0)
+        {
+            writer.WriteLine("// Direct + transitive bases:");
+            foreach (var bc in entry.BaseClasses)
+            {
+                var baseEntry = entries.FirstOrDefault(e => e.DemangledName == bc);
+                var vtInfo = baseEntry?.VTableVA != null ? $"vt=0x{baseEntry.VTableVA.Value:X8}" : "no vtable";
+                writer.WriteLine($"//   <- {bc} ({vtInfo})");
+            }
+        }
+        else
+            writer.WriteLine("// No base classes (root type)");
+
+        writer.WriteLine();
+        writer.WriteLine("// Derived classes:");
+        var derived = entries.Where(e =>
+            e.BaseClasses != null && e.BaseClasses.Contains(entry.DemangledName)).ToList();
+
+        if (derived.Count > 0)
+            foreach (var d in derived.OrderBy(d => d.DemangledName))
+                writer.WriteLine($"//   -> {d.DemangledName}");
+        else
+            writer.WriteLine("//   (none found)");
+    }
+
+    public static List<RttiEntry> SearchClasses(string exePath, string pattern)
+    {
+        var entries = ExtractAll(exePath);
+        return entries.Where(e =>
+            e.DemangledName.Contains(pattern, StringComparison.OrdinalIgnoreCase) ||
+            e.MangledName.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(e => e.DemangledName)
+            .ToList();
     }
 
     public static void DumpVtable(string exePath, string className, string outputPath)
