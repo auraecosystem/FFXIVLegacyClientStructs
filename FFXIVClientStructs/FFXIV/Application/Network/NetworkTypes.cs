@@ -3,33 +3,23 @@ using FFXIVClientStructs.Attributes;
 
 namespace FFXIVClientStructs.FFXIV.Application.Network;
 
-// SQEX::Socket::RUDP2::ACKSegment — custom reliable UDP transport
-[Rtti(".?AVACKSegment@RUDP2@Socket@Sqex@@")]
-[StructLayout(LayoutKind.Explicit, Size = 0x40)]
-public unsafe struct ACKSegment
+[Rtti(".?AVNetworkModule@Network@Application@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct NetworkModule
 {
-    [FieldOffset(0x00)] public nint VTable;
+    [FieldOffset(0x00)] public nint VTable; // 0x00F91B5C (1 vfunc)
 }
 
-// Application::Network::Component::ConnectionManager
-// Manages IPC connections to lobby/zone/chat servers
-[Rtti(".?AVConnectionManager@IpcChannel@Network@Component@@")]
-[StructLayout(LayoutKind.Explicit, Size = 0x100)]
-public unsafe struct ConnectionManager
+[Rtti(".?AVLobbyClientModule@Network@Application@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct LobbyClientModule
 {
-    [FieldOffset(0x00)] public nint VTable;
+    [FieldOffset(0x00)] public nint VTable; // 0x00F91AAC (1 vfunc)
 }
 
-// Application::Network::Component::ChannelManagerBase
-[Rtti(".?AVChannelManagerBase@IpcChannel@Network@Component@@")]
-[StructLayout(LayoutKind.Explicit, Size = 0x80)]
-public unsafe struct ChannelManagerBase
+[Rtti(".?AVMyGameLoginCallback@Network@Application@@")]
+[StructLayout(LayoutKind.Explicit, Size = 0x60)]
+public unsafe struct MyGameLoginCallback
 {
-    [FieldOffset(0x00)] public nint VTable;
+    [FieldOffset(0x00)] public nint VTable; // 0x00F91AB4 (22 vfuncs)
 }
-
-// Protocol channels (from RTTI):
-//   ZoneProtoChannel — game world IPC
-//   LobbyProtoChannel — lobby/character select IPC
-//   ChatProtoChannel — chat system IPC
-// Each has: ClientPacketBuilder, ServiceConsumerConnectionManager
