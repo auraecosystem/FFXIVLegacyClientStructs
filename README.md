@@ -52,6 +52,24 @@ Explicit-layout structs mapping game memory, organized to mirror the original C+
 | `SocketBase` | 0x1A4 (420 bytes) | 0x011132DC | 18 | WinSock2 abstraction. Mutex, ring buffers, stats counters, endpoint info |
 | `RUDPImpl` | ~0x300 | 0x01113378 | 14 | RUDP2 state machine. Retransmission, selective ACK, keepalive |
 
+### Crystal Tools Engine (1,002 structs across 39 files)
+
+Complete mapping of all Crystal Tools engine subsystems extracted via RTTI from the 1.23b binary:
+
+| Subsystem | Structs | Files | Key Types |
+|---|---|---|---|
+| **Fw** — Framework | 28 | 2 | ApplicationConfiguration (12 config types), SceneObject Actor (16 base actor types) |
+| **Common** | 36 | 3 | ISceneObject hierarchy (30 types), Task system (5), Timer |
+| **Memory** | 42 | 1 | IAllocator, SystemHeap, Alternative heap families (Separate/Removable/Receivable/Detachable/System × Block+Space+Debug, nested Serializer/Chunk) |
+| **Math** | 2 | 1 | DelegateHolderBase, TDynamicArrayFloatPoint3 |
+| **Media** | 5 | 1 | Media subsystem base types |
+| **Dw** — Rendering | 183 | 5 | Renderer (109), SceneGraph (36), Animation (28), RenderInterface (6), ResourceLoader (4) |
+| **Lay** — Layout | 150 | 6 | Stella engine: Layout (65), Default (44), External (17), StellaCore (12), Display (10), Resource (2) |
+| **Cut** — Cutscene | 175 | 3 | Plugins (100 clip/actor/scheduler types), Scheduler (59 state machine types), CutScene (16 listeners) |
+| **Vfx + CDevVfx** — VFX | 183 | 8 | VfxResourceFormat (48 nested attributes), Qix (44 graph/node), CDevVfx (37), IVfxObject (19 interfaces), VfxResourceModel (11), Common/Renderer/RenderInterface (24) |
+| **Sd** — Sound | 102 | 3 | Driver (77 incl. 27 XA2 XAPO processors), Layout (22 spatial sound), Whiz (3) |
+| **Phieg** — Physics | 96 | 6 | ClothDynamics (30 constraints/forces), RigidDynamics (21), Collision (14 GJK convex), Controller (13 IK/ragdoll/wind), IKDynamics (10), Base (8) |
+
 ### Sqwt UI Framework (685 RTTI classes)
 Square Enix Widget Toolkit — a full WPF-inspired UI framework used for all of FFXIV 1.0's interface: character creation, HUD, menus, chat, config, map screen, nameplate overlays, and login screens.
 
@@ -194,7 +212,19 @@ FFXIVClientStructs/
   Attributes/         Custom attributes for marking RE data
   Interop/            SignatureScanner, Memory, Pointer<T>, GameInfo
   STD/                MSVC x86 std::string, std::vector, std::map
-  SQEX/CDev/Engine/   Crystal Tools engine subsystems
+  SQEX/CDev/Engine/   Crystal Tools engine (1,002 structs)
+    Fw/               Framework, SceneObject Actor (28)
+    Common/           ISceneObject, Task, Timer (36)
+    Memory/           Allocators, Alternative heap families (42)
+    Math/             DelegateHolderBase, TDynamicArray (2)
+    Media/            Media subsystem (5)
+    Dw/               Rendering: Renderer, Animation, SceneGraph, RenderInterface, ResourceLoader (183)
+    Lay/              Layout: Stella engine + Default (150)
+    Cut/              Cutscene: Plugins, Scheduler, Listeners (175)
+    Vfx/              VFX: Qix, VfxResourceFormat/Model, Common, Renderer, RenderInterface (146)
+    CDevVfx/          VFX bridge layer (37)
+    Sd/               Sound: Driver/XA2, Layout, Whiz (102)
+    Phieg/            Physics: ClothDynamics, RigidDynamics, Collision, Controller, IK (96)
   FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI, game enums)
   FFXIV/Component/    IPC channel base framework (NetBuffer, ConnectionManager)
   Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller)
