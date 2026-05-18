@@ -37,7 +37,7 @@ Top-level namespaces:
 - `Sqwt` (685 classes) — Full WPF-inspired UI framework with XAML markup, data binding, templates, routed events, animations, dependency properties, visual tree, input system, document model
 
 ### C# Struct Library
-Explicit-layout structs mapping game memory, organized to mirror the original C++ namespace hierarchy. Key structs with confirmed data from RE:
+**2,569 explicit-layout structs** across 104 files, organized to mirror the original C++ namespace hierarchy. Key structs with confirmed data from RE:
 
 | Struct | Size | VTable | VFuncs | Notes |
 |---|---|---|---|---|
@@ -89,6 +89,89 @@ Square Enix Widget Toolkit — a full WPF-inspired UI framework used for all of 
 | **Threading** | 4 | Mutex, Thread (4), Timer, ParameterizedThreadStartBase |
 | **Xml** | 3 | XmlDocument (3), XmlElemenBase (8), XmlElement (3) |
 | **Utility** | 5 | EditorControler, File, WidgetParts, WidgetPartsActual, WidgetPartsRefference |
+
+### Application Scene (421 structs across 9 files)
+
+Scene-side game systems extracted via RTTI:
+
+| Subsystem | Structs | Files | Key Types |
+|---|---|---|---|
+| **Scene::Cut** — Cutscene Playback | 298 | 2 | Clip (271 BaseClipImpl template instantiations + 7 light/listener clips), CutScene (27 Scheduler/Listeners/Register/CutScenePlayer) |
+| **Scene::Actor** — Game Actors | 53 | 6 | CharaActor (188 vfuncs), TargetActor, GameManagerActor, CameraActor, BootupActor, MapActors |
+| **Scene Systems** | 70 | 1 | Vfx (22 VfxActor/Controller types), Command::Window::DrawParam (12), Query (8 spatial), Controllers (5), System (3), misc (20) |
+
+### Application Lua Scripting (221 structs across 8 files)
+
+Complete Lua runtime and scripting bindings:
+
+| Subsystem | Structs | Files | Key Types |
+|---|---|---|---|
+| **Client::Control** | 66 | 1 | 58 control types (CharaBase, NpcBase, PlayerBase, WidgetBase, WorldMaster, SpreadSheet, CutScene, DesktopWidget) + TypeChecker templates |
+| **Client::Command** | 52 | 1 | Network (31 packet receivers), System (11), Item (10 item commands) |
+| **Client::Event** | 29 | 1 | 28 event types + ExecutionClientSideBlockEvent |
+| **Client::Group** | 16 | 1 | Group management (PropertyUpdater, MemberInfoUpdater, Entry) |
+| **Client** (misc) | 16 | 1 | TextModuleAdapter, BehaviorLogger, RaptureSystemProxy, DisplayNameResolver |
+| **LuaTypes** (existing) | 28 | 1 | Bindings (166 API functions), Work types (11 Information variants), Memory containers |
+| **InterfaceToSqwt** | 6 | 1 | Lua↔Sqwt bridge (property/storyboard processors) |
+| **Common** | 4 | 1 | NetworkParameterUnpacker, Control::Debug, Control::Global |
+
+### Application Main UI (405 structs across 11 files)
+
+Game UI windows, menus, and system elements:
+
+| Subsystem | Structs | Files | Key Types |
+|---|---|---|---|
+| **SqwtInterface** | 93 | 1 | 51 CustomControl types + 38 bridge types + XamlRaptureSsdDataReader |
+| **Menu::Bootup** | 79 | 1 | CharacterCreation (34), Bootup root (30), Patch (17), Retainer (5) |
+| **Element::Window::Widget** | 75 | 1 | 80 game window widgets (inventory, chat, party, action bar, etc.) |
+| **Element** (misc) | 43 | 1 | Chara (8), Form (13), Map (3), Effect (3), Light, root elements (16) |
+| **Menu** (non-Bootup) | 38 | 1 | Common (14), MessageDialog (6), ErrorDialog (6), Installer (6), Controls (2) |
+| **Element::System** | 27 | 1 | Phase system (15), CameraElement, TargetElement, WeatherElement |
+| **Element::Window::Debug** | 26 | 1 | Debug windows (16) + LuaDebug (6) + Start (4) |
+| **Main** (root) | 9 | 1 | MainModule, Shell, RaptureModule |
+| **Element::Window** (misc) | 3 | 1 | WindowPositionConfig |
+| **CharaElement** (existing) | 6 | 1 | CharaElement, BootupElement, CameraElement, CustomControlElement, CommonResourceElement, TargetInfo |
+| **Widgets** (existing) | 6 | 1 | CommunicationWidget, ActionEquipWidget, ConfigWidget, AetheryteListWidget, CommunityMenuWidget, BazaarEditWidget |
+
+### Component Modules (147 structs across 13 files)
+
+Framework-level modules:
+
+| Module | Structs | Key Types |
+|---|---|---|
+| **Lua::GameEngine** | 65 | LuaControl, WorkMemory (21 detail types), Work (18), MetamethodArray2D, Parameter, LpbLoader, Functor |
+| **Text** | 17 | TextModule, Localize (MacroDecoder/Encoder, FontCode), TextModuleInterface |
+| **Excel** | 12 | ExcelModule, ExcelSheet, ExcelEntry, language events, PAVExcelEntry cache types |
+| **Install** | 10 | InstallWriter, InstallDecoder, InstallModuleInterface, WriterEntry |
+| **Patch** | 9 | ZiPatch (file, chunks), PatchPhaseControl |
+| **Resource** | 7 | ResourceManager, ResourceEvent, loaders |
+| **Network/IPC** (existing) | 6 | IpcChannelTypes |
+| **Xml** | 5 | DOM_Text, DOM_Node, DOMParser wrappers |
+| **Sound** | 5 | SoundModule, SoundCache |
+| **Font** | 5 | BitmapFont, OsFont, FontModule |
+| **Completion** | 4 | Achievement/completion system |
+| **GAM** (existing) | 4 | GAM module types |
+| **Log** | 2 | LogModule |
+
+### Sqex SDK (51 structs)
+
+Platform SDK types outside the engine:
+
+| Module | Structs | Key Types |
+|---|---|---|
+| **Input** | 15 | Keyboard, Mouse, Pad, Cicero IME, TextService, SoftKeyboard |
+| **File** | 10 | DivFile, LocalFile, LocalDir (Copy/Find/Remove executors), ResourceSafePath |
+| **Crypt** | 5 | Cert, Crc32, ShuffleString, SimpleString, CryptInterface |
+| **Http** | 5 | HttpClient, HttpRequest, HttpHeader |
+| **Upnp** | 4 | UpnpService, UpnpPortMapping, UpnpDeviceFinder |
+| **Thread** | 4 | Mutex, ReadWriteLock, ThreadManager |
+| **Data** | 3 | BlockMemory, PackRead, PackWrite |
+| **Socket** (existing) | 14 | SocketBase, RUDPImpl, SocketWinsock, Poller |
+| **Misc** | 3 | Config, AnyType, NonCopyable |
+
+### Application::Misc (19 structs)
+
+Configuration and support modules: GameConfig, UserConfig, SystemConfig, ResourceConfig (with ConfigChangeEvent), FontModule, LogModule, MacroModule, SoundModule, TextureManager, RaptureSupportModule, StringTable, AsyncWork.
 
 ### Network Architecture
 Three IPC channels, each with its own connection manager, packet builder, socket thread, and buffer infrastructure:
@@ -225,9 +308,23 @@ FFXIVClientStructs/
     CDevVfx/          VFX bridge layer (37)
     Sd/               Sound: Driver/XA2, Layout, Whiz (102)
     Phieg/            Physics: ClothDynamics, RigidDynamics, Collision, Controller, IK (96)
-  FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI, game enums)
-  FFXIV/Component/    IPC channel base framework (NetBuffer, ConnectionManager)
-  Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller)
+  FFXIV/Application/  Game-layer structs (1,085 structs)
+    Scene/            Actor (53), Cut (298 clip types), SceneSystems (70)
+    Script/Lua/       Lua scripting: Client (179), InterfaceToSqwt (6), Common (4), LuaTypes (28)
+    Main/             UI: Element (175), SqwtInterface (93), Menu (117), MainTypes (9)
+    Network/          ZoneProto, LobbyProto, ChatProto channels (43)
+    Misc/             Config, support modules (19)
+    Game/             GameEnums
+  FFXIV/Component/    Framework modules (147 structs)
+    Lua/              GameEngine runtime (65)
+    Text/             Localization (17)
+    Excel/            Spreadsheet data (12)
+    Install/          Installer (10)
+    Patch/            ZiPatch (9)
+    Resource/         Resource loading (7)
+    Sound/, Font/, Xml/, Completion/, Log/ (21 combined)
+  SQEX/SqexSDK.cs     Platform SDK: Input, File, Crypt, Http, Upnp, Thread, Data (51)
+  Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller) (14)
   Sqwt/               UI framework (685 classes)
     SqwtCore.cs        Core types, templates, triggers, dependency properties
     Visual.cs          Visual tree, UIElement, FrameworkElement, Window, Media types
