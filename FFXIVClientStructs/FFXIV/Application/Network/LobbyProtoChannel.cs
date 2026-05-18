@@ -20,6 +20,9 @@ namespace FFXIVClientStructs.FFXIV.Application.Network;
 public unsafe struct LobbyConnectionManager
 {
     // Inherits: ConnectionManagerTmpl<TLobbyDown, TLobbyUp> → ConnectionManager
+    // PM: ClientConnection holds userId, accountId, sessionToken, Blowfish cipher,
+    //   byte[0xFFFF] buffer, CircularBuffer(1024), SendPacketQueue(100 cap).
+    //   Port: FFXIV_LOBBY_PORT = 54994. Actor sourceId = 0xE0006868.
     [FieldOffset(0x00)] public nint VTable; // 0x01127714 (4 vfuncs)
 }
 
@@ -28,6 +31,13 @@ public unsafe struct LobbyConnectionManager
 public unsafe struct LobbyCryptEngine
 {
     // Inherits: CryptEngineInterface
+    //
+    // PM cross-ref: Blowfish cipher (16 rounds, P[18], S[4][256]).
+    // Handshake: client sends SecurityHandshakePacket (0x288 bytes, detected by
+    //   data[0x34]=='T'). Server extracts ticketPhrase (0x40 bytes @ +0x34) +
+    //   clientNumber (uint32 after phrase) → GenerateKey() → Blowfish init.
+    // Server replies with hardcoded g_secureConnectionAcknowledgment (0x2A0 bytes).
+    // After handshake, SubPacket data is encrypted (headers remain plaintext).
     [FieldOffset(0x00)] public nint VTable; // 0x01127698 (9 vfuncs)
 }
 
@@ -66,6 +76,9 @@ public unsafe struct LobbyProtoDownCallbackInterface
 }
 
 // Lobby client operations — login sequence state machines
+// PM login flow: SecurityHandshake → ServiceLogin → LobbyLogin → GetCharacters →
+//   SelectCharacter (receives SelectCharacterConfirmPacket: actorId, sessionToken,
+//   worldIp:worldPort) → GameLogin (connect to map server with sessionToken)
 
 [Rtti(".?AVOperationStep@LobbyClientMixin@LobbyClient@Network@Application@@")]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]

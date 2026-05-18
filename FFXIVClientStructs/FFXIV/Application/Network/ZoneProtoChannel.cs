@@ -26,6 +26,10 @@ public unsafe struct ZoneSocketThread
 public unsafe struct ZoneConnectionManager
 {
     // Inherits: ConnectionManagerTmpl<TZoneDown, TZoneUp> → ConnectionManager
+    // PM: ConnectionType=1 (TYPE_ZONE). SendPacketQueue(1000 cap).
+    //   Session init via SubPacketType 0x01 (Hello, sessionId @ +0x14).
+    //   Keepalive: ServerPing(0x07) → ClientPong(0x08), actorId=0x0E016EE5.
+    //   No encryption (Blowfish is lobby-only).
     [FieldOffset(0x00)] public nint VTable; // 0x01129768 (4 vfuncs)
 }
 

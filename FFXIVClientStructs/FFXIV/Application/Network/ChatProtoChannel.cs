@@ -28,6 +28,8 @@ public unsafe struct ChatSocketThread
 public unsafe struct ChatConnectionManager
 {
     // Inherits: ConnectionManagerTmpl<TChatDown, TChatUp> → ConnectionManager
+    // PM: ConnectionType=2 (TYPE_CHAT). Separate TCP connection from Zone.
+    //   No encryption. Session init same as Zone (SubPacketType 0x01).
     [FieldOffset(0x00)] public nint VTable; // 0x01129248 (4 vfuncs)
 }
 

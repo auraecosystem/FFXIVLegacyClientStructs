@@ -17,6 +17,18 @@ namespace FFXIVClientStructs.FFXIV.Component.Network.IpcChannel;
 //
 // TProtoDown = server→client packets (receive/dispatch)
 // TProtoUp   = client→server packets (build/send)
+//
+// PM cross-ref dispatch flow:
+//   1. Socket receive → BasePacket.CreatePacket(ref offset, buffer, bytesRead) loop
+//   2. BasePacket.GetSubpackets() → List<SubPacket>
+//   3. If isCompressed: DecompressPacket(ref packet)
+//   4. If isAuthenticated: DecryptPacket(blowfish, ref packet) — lobby only
+//   5. SubPacket.header.type switch:
+//      - 0x01 (SessionInit) → AddSession(client, channel, sessionId)
+//      - 0x03 (GameMessage) → opcode switch → per-opcode handler
+//      - 0x07 (ServerPing)  → queue _0x8PingPacket response
+//      - ≥0x1000            → inter-server routing
+//   6. FlushQueuedSendPackets() → socket write
 // ============================================================================
 
 [Rtti(".?AVPacketBufferBase@IpcChannel@Network@Component@@")]
@@ -37,6 +49,8 @@ public unsafe struct NetBufferBase
 [StructLayout(LayoutKind.Explicit, Size = 0x100)]
 public unsafe struct ConnectionManager
 {
+    // PM: ClientConnection holds socket, buffer[0xFFFF], SendPacketQueue,
+    //   lastPartialSize, Blowfish cipher (lobby), userId/account/sessionToken.
     [FieldOffset(0x00)] public nint VTable; // base for all channel-specific connection managers
 }
 
