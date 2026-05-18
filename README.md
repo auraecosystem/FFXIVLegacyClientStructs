@@ -26,7 +26,7 @@ Since 1.23b was the last patch ever released, **all addresses are frozen forever
 ## What's Inside
 
 ### RTTI Database
-**4,358 classes** extracted from the binary with full MSVC mangled/demangled names, vtable virtual addresses, and virtual function counts. 3,877 classes have vtable addresses resolved.
+**4,358 classes** extracted from the binary with full MSVC mangled/demangled names, vtable virtual addresses, virtual function counts, and **inheritance hierarchies** (via ClassHierarchyDescriptor → BaseClassArray chain). 3,877 classes have vtable addresses resolved.
 
 Top-level namespaces:
 - `SQEX::CDev::Engine` (1,492 classes) — Core Crystal Tools engine: Framework, Rendering (Dw), Layout (Stella/Lay), Sound (Sd), VFX (Qix), Physics (Phieg), Cutscene scheduler (Cut), Memory management
@@ -62,13 +62,20 @@ Complete extraction of the Lua-exposed client API, including:
 The `FFXIVClientStructs.Tools.CLI` project provides automated analysis directly from the exe:
 
 ```
---rtti              Dump full RTTI database (4,358 classes)
+--rtti              Dump full RTTI database (4,358 classes with inheritance)
 --imports           Dump import table (21 DLLs, ~400 functions)
 --vtable <class>    Dump complete vtable for any RTTI class
---analyze <class>   Extract struct layout from constructor: field offsets, sizes, embedded sub-objects
+--vtfuncs <class>   Analyze vtable functions: size, params, stub/pure detection
+--analyze <class>   Extract struct layout from constructor: field offsets, sizes, embedded sub-objects, base ctor chain
+--hierarchy <class> Show full inheritance tree (base classes + derived classes)
+--search <pattern>  Search classes by name pattern
+--strings <class>   Extract string references from class constructor and vtable functions
+--findstr <string>  Find all cross-references to a string literal in .text
+--all               Run all dumps (rtti + imports)
+--exe <path>        Override path to ffxivgame.exe
 ```
 
-Example:
+Examples:
 ```
 dotnet run -- --analyze CharaActor
 
@@ -77,13 +84,41 @@ dotnet run -- --analyze CharaActor
 // Ctor:   0x0065F180
 // Size:   0x2BB0 (11184 bytes)
 //
-// +0x0154 [float] = xmm0
-// +0x0158 [float] = xmm0
-// +0x1170 [dword] = 0x000000ED
-// +0x1178 [dword] = 0x000000C9
+// === Base Class Constructors ===
+//   RaptureActor (ctor=0x..., vt=0x00FEA50C, 12 fields)
+//
+// === Fields (from constructor init) === [44 total]
+// +0x0154 [float ] = xmm0
+// +0x0158 [float ] = xmm0
+// +0x1170 [dword ] = 0x000000ED
+// +0x1178 [dword ] = 0x000000C9
 // ...
+// === Embedded Sub-Objects === [40 total]
 // +0x2858 CharaActionController (vt=0x0103E468)
 // +0x2B60 CharaCutVisualCtrl (vt=0x0104447C)
+```
+
+```
+dotnet run -- --hierarchy CharaActor
+
+// Inheritance hierarchy for: Application::Scene::Actor::Chara::CharaActor
+//
+// Direct + transitive bases:
+//   <- Application::Scene::Actor::CDevActor
+//   <- Application::Scene::RaptureActor (vt=0x00FEA50C)
+//   <- SQEX::CDev::Engine::Fw::SceneObject::Actor (vt=0x0109CA94)
+//   <- SQEX::CDev::Engine::Common::ISceneObject::IActor
+//   <- SQEX::CDev::Engine::Common::Misc::NonCopyable
+```
+
+```
+dotnet run -- --vtfuncs CharaActor
+
+// Summary: 188 total, 0 pure virtual, 30 stubs
+// vt[  0] 0x00669E20 (6B) thiscall(this) [STUB]
+// vt[  1] 0x006207D0 (135B) thiscall(this)
+// vt[ 23] 0x00661F00 (140B) thiscall(this, arg1, arg2)
+// ...
 ```
 
 ## Building
@@ -104,7 +139,7 @@ FFXIVClientStructs/
   SQEX/CDev/Engine/   Crystal Tools engine subsystems
   FFXIV/Application/  Game-layer structs (actors, network, Lua, UI)
   Sqwt/               UI framework types
-  Tools/              RttiDumper, ImportTableDumper, StructAnalyzer
+  Tools/              RttiDumper, ImportTableDumper, StructAnalyzer, VtableAnalyzer, StringExtractor
 
 FFXIVClientStructs.Tools.CLI/
   Console tool for automated binary analysis
