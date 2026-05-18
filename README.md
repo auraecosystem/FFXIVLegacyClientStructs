@@ -62,6 +62,17 @@ Transport stack: `SocketBase → SocketWinsock → SocketImpl → RUDPSocket →
 
 RUDP2 segment types: SYN, ACK, DAT, EAK (selective ack), NUL (keepalive), RST (reset) — follows RFC 908/1151 naming.
 
+### Project Meteor Cross-Reference
+Server-side field names from [Project Meteor](https://bitbucket.org/Ioncannon/project-meteor-server) mapped to client binary structures:
+
+- **Modifier enum** (132 entries) — stat/property IDs used in `SetActorProperty` (0x0137) and buff system
+- **BattleTemp.generalParameter[35]** — runtime stat indices (STR=3, VIT=4, DEX=5, INT=6, MND=7, PIE=8, elemental resist 9–14, Acc/Eva/Atk/Def 15–18, magic 23–28, craft 30–34)
+- **SubState** bitfield — breakage, chantId, guard, waste, mode, motionPack
+- **28 AppearanceSlot** indices — character visual state (gear slots 5–27, face/body 0–4)
+- **ParameterSave** — HP[8], MP, 40 recast timers, skill slots, ability cost points
+- **Zone opcodes** (150+) — `AddActor` 0x00CA, `SetPosition` 0x00CE, `SetAppearance` 0x00D6, `SetState` 0x0134, `CommandResult` 0x0139, `SetStatus` 0x0177, etc.
+- **Wire format** — BasePacket (0x10) → SubPacket (0x10) → GameMessage (0x10, opcode at +0x02)
+
 ### Lua Script API (166 bindings)
 Complete extraction of the Lua-exposed client API, including:
 - Character data: `_getPosition`, `_getDirection`, `_getOrientation`, `_getActorMainStat`, `_getDisplayName`
@@ -152,7 +163,7 @@ FFXIVClientStructs/
   Interop/            SignatureScanner, Memory, Pointer<T>, GameInfo
   STD/                MSVC x86 std::string, std::vector, std::map
   SQEX/CDev/Engine/   Crystal Tools engine subsystems
-  FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI)
+  FFXIV/Application/  Game-layer structs (actors, network channels, Lua, UI, game enums)
   FFXIV/Component/    IPC channel base framework (NetBuffer, ConnectionManager)
   Sqex/Socket/        Transport layer (SocketBase, RUDP2 segments, Poller)
   Sqwt/               UI framework types

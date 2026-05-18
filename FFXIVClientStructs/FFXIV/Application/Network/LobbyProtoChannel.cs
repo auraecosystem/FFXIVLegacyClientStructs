@@ -51,8 +51,10 @@ public unsafe struct LobbyClientPacketBuilder
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public unsafe struct LobbyProtoDownCallback
 {
-    // 14 vfuncs — one handler per server→client lobby packet opcode
-    // Inherits: LobbyProtoDownCallbackInterface → RecvCallbackInterface
+    // 14 vfuncs — one handler per server→client lobby packet opcode.
+    // PM cross-ref: ServiceLoginReply(0x07), LobbyLoginReply(0x08),
+    //   CharacterList(0x0D), GameLoginReply(0x0E), WorldList(0x15)
+    // Full enum: see LobbyOpcode in PacketOpcodes.cs
     [FieldOffset(0x00)] public nint VTable; // 0x01128468 (14 vfuncs)
 }
 
