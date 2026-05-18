@@ -1,0 +1,434 @@
+// FFXIV 1.0 (1.23b) Import Table
+// Generated from: ffxivgame.exe
+
+[KERNEL32.dll] (185 imports)
+  FormatMessageA
+  ConvertThreadToFiber
+  DeleteFiber
+  CreateFiberEx
+  SwitchToFiber
+  IsProcessorFeaturePresent
+  VirtualQuery
+  SetCurrentDirectoryW
+  GetCurrentDirectoryW
+  TryEnterCriticalSection
+  MoveFileA
+  CreateThread
+  ExitThread
+  SetFilePointerEx
+  GetFileSizeEx
+  RemoveDirectoryW
+  CreateDirectoryW
+  GetDiskFreeSpaceW
+  GetDiskFreeSpaceExW
+  FindNextFileW
+  TerminateThread
+  DeleteFileA
+  DuplicateHandle
+  GetFileAttributesA
+  CreatePipe
+  WideCharToMultiByte
+  SetFilePointer
+  CreateEventA
+  ResetEvent
+  SetEvent
+  WaitForSingleObject
+  LoadLibraryA
+  InterlockedExchange
+  GetVersionExA
+  GetProcAddress
+  GetSystemInfo
+  QueryPerformanceCounter
+  QueryPerformanceFrequency
+  GlobalMemoryStatus
+  OutputDebugStringA
+  LeaveCriticalSection
+  EnterCriticalSection
+  DeleteCriticalSection
+  InitializeCriticalSection
+  FindResourceW
+  LoadResource
+  SizeofResource
+  LockResource
+  GetFileSize
+  ReadFile
+  lstrcpyW
+  lstrcatW
+  GetUserDefaultLangID
+  GetSystemDefaultLCID
+  InterlockedCompareExchange
+  InterlockedExchangeAdd
+  SetProcessAffinityMask
+  GetCurrentThread
+  SetThreadAffinityMask
+  CreateMutexW
+  GetSystemDirectoryA
+  GetTickCount
+  lstrcpyA
+  GetLastError
+  Sleep
+  GetCurrentProcess
+  SetPriorityClass
+  CreateFileW
+  WriteFile
+  GetCurrentThreadId
+  GetModuleFileNameW
+  GetModuleHandleA
+  ReleaseMutex
+  CloseHandle
+  SetEnvironmentVariableW
+  MultiByteToWideChar
+  CreateSemaphoreA
+  SetThreadPriority
+  SetThreadIdealProcessor
+  ReleaseSemaphore
+  GetProcessAffinityMask
+  OpenThread
+  GetThreadPriority
+  SleepEx
+  CompareStringW
+  CompareStringA
+  GetConsoleOutputCP
+  WriteConsoleA
+  SetEndOfFile
+  GetLocaleInfoW
+  LoadLibraryW
+  CreateFileA
+  GetTimeZoneInformation
+  GetFullPathNameW
+  FlushFileBuffers
+  GetConsoleCP
+  LocalFileTimeToFileTime
+  SetFileTime
+  GetDriveTypeA
+  SetStdHandle
+  GetEnvironmentStringsW
+  FreeEnvironmentStringsW
+  GetEnvironmentStrings
+  FreeEnvironmentStringsA
+  GetStringTypeW
+  GetStringTypeA
+  CreateProcessA
+  lstrcatA
+  lstrlenA
+  GetModuleFileNameA
+  FileTimeToSystemTime
+  lstrcmpA
+  GetFileAttributesW
+  SetFileAttributesW
+  MoveFileExW
+  DeleteFileW
+  lstrcmpW
+  GetVolumeInformationW
+  TlsSetValue
+  TlsGetValue
+  TlsFree
+  TlsAlloc
+  InitializeCriticalSectionAndSpinCount
+  FreeLibrary
+  GetVersion
+  GetFileType
+  GetStdHandle
+  GetCurrentProcessId
+  FlushConsoleInputBuffer
+  InterlockedIncrement
+  InterlockedDecrement
+  SwitchToThread
+  SystemTimeToFileTime
+  GetSystemTime
+  GlobalFree
+  GlobalUnlock
+  GlobalLock
+  GlobalAlloc
+  RaiseException
+  RtlUnwind
+  TerminateProcess
+  UnhandledExceptionFilter
+  SetUnhandledExceptionFilter
+  IsDebuggerPresent
+  HeapAlloc
+  HeapFree
+  VirtualFree
+  VirtualAlloc
+  HeapReAlloc
+  GetCommandLineA
+  GetProcessHeap
+  GetStartupInfoA
+  GetSystemTimeAsFileTime
+  SetEnvironmentVariableA
+  GetCurrentDirectoryA
+  SetCurrentDirectoryA
+  GetFullPathNameA
+  FindClose
+  FileTimeToLocalFileTime
+  GetDriveTypeW
+  FindFirstFileW
+  ExitProcess
+  SetConsoleCtrlHandler
+  ReadConsoleInputA
+  SetConsoleMode
+  GetConsoleMode
+  WriteConsoleW
+  GetCPInfo
+  LCMapStringA
+  LCMapStringW
+  SetLastError
+  GetACP
+  GetOEMCP
+  IsValidCodePage
+  HeapSize
+  SetHandleCount
+  HeapDestroy
+  HeapCreate
+  GetTimeFormatA
+  GetDateFormatA
+  GetUserDefaultLCID
+  GetLocaleInfoA
+  EnumSystemLocalesA
+  IsValidLocale
+  GetExitCodeProcess
+
+[USER32.dll] (67 imports)
+  DispatchMessageW
+  PeekMessageA
+  DispatchMessageA
+  SetCursorPos
+  GetCursorPos
+  ScreenToClient
+  SetCapture
+  ReleaseCapture
+  GetKeyboardState
+  ToAscii
+  keybd_event
+  GetDC
+  ReleaseDC
+  TranslateMessage
+  PeekMessageW
+  PostMessageA
+  SetCursor
+  EnumWindows
+  ClientToScreen
+  GetUserObjectInformationW
+  GetProcessWindowStation
+  GetDesktopWindow
+  MessageBoxA
+  CloseClipboard
+  SetClipboardData
+  EmptyClipboard
+  OpenClipboard
+  GetClipboardData
+  GetActiveWindow
+  DefWindowProcW
+  SetWindowsHookExA
+  SetTimer
+  SetWindowTextW
+  GetWindowRect
+  SystemParametersInfoA
+  AttachThreadInput
+  MessageBoxW
+  DestroyWindow
+  SetDlgItemTextW
+  GetClientRect
+  SetRect
+  AdjustWindowRectEx
+  RegisterClassExA
+  SendMessageA
+  DefWindowProcA
+  PostQuitMessage
+  ShowWindow
+  LoadIconA
+  UnhookWindowsHookEx
+  CallNextHookEx
+  CharNextA
+  GetWindowThreadProcessId
+  GetForegroundWindow
+  LoadCursorA
+  SetActiveWindow
+  SetForegroundWindow
+  KillTimer
+  GetMenu
+  AdjustWindowRect
+  InsertMenuItemA
+  CreateMenu
+  SetWindowPos
+  SetWindowLongA
+  CreateWindowExA
+  RegisterClassExW
+  GetSystemMetrics
+  ClipCursor
+
+[GDI32.dll] (13 imports)
+  SelectObject
+  DeleteObject
+  GetGlyphOutlineW
+  LineTo
+  CreateFontW
+  GetTextMetricsA
+  GetStockObject
+  MoveToEx
+  CreatePen
+  TextOutA
+  GetTextExtentPoint32A
+  Ellipse
+  CreateFontIndirectA
+
+[ADVAPI32.dll] (8 imports)
+  DeregisterEventSource
+  RegQueryValueExW
+  RegCreateKeyExA
+  RegOpenKeyExW
+  RegCloseKey
+  ReportEventA
+  RegisterEventSourceA
+  GetUserNameA
+
+[SHELL32.dll] (5 imports)
+  SHGetSpecialFolderLocation
+  SHGetMalloc
+  SHGetPathFromIDListW
+  ShellExecuteW
+  ShellExecuteA
+
+[ole32.dll] (8 imports)
+  CoGetClassObject
+  CoUninitialize
+  CoTaskMemFree
+  CoTaskMemAlloc
+  CoInitialize
+  CoInitializeEx
+  CoCreateInstance
+  CoSetProxyBlanket
+
+[WINTRUST.dll] (1 imports)
+  WinVerifyTrust
+
+[CRYPT32.dll] (7 imports)
+  CertFindCertificateInStore
+  CertFreeCertificateContext
+  CertCloseStore
+  CryptMsgGetParam
+  CryptQueryObject
+  CryptDecodeObject
+  CryptMsgClose
+
+[VERSION.dll] (6 imports)
+  GetFileVersionInfoSizeW
+  GetFileVersionInfoW
+  VerQueryValueW
+  VerQueryValueA
+  GetFileVersionInfoA
+  GetFileVersionInfoSizeA
+
+[IMM32.dll] (12 imports)
+  ImmGetVirtualKey
+  ImmReleaseContext
+  ImmNotifyIME
+  ImmSetConversionStatus
+  ImmGetConversionStatus
+  ImmSetOpenStatus
+  ImmGetOpenStatus
+  ImmAssociateContext
+  ImmGetContext
+  ImmDisableTextFrameService
+  ImmGetCandidateListW
+  ImmGetCompositionStringW
+
+[WINMM.dll] (6 imports)
+  timeEndPeriod
+  timeKillEvent
+  timeSetEvent
+  timeGetDevCaps
+  timeBeginPeriod
+  timeGetTime
+
+[WS2_32.dll] (30 imports)
+  Ordinal #7
+  Ordinal #115
+  Ordinal #151
+  Ordinal #18
+  Ordinal #116
+  Ordinal #21
+  Ordinal #14
+  Ordinal #57
+  getaddrinfo
+  Ordinal #12
+  Ordinal #20
+  Ordinal #5
+  Ordinal #17
+  Ordinal #10
+  Ordinal #3
+  Ordinal #9
+  Ordinal #111
+  freeaddrinfo
+  Ordinal #16
+  Ordinal #19
+  Ordinal #4
+  Ordinal #1
+  Ordinal #13
+  Ordinal #2
+  Ordinal #23
+  Ordinal #15
+  Ordinal #8
+  Ordinal #6
+  WSAIoctl
+  Ordinal #11
+
+[d3d9.dll] (4 imports)
+  Direct3DCreate9
+  D3DPERF_EndEvent
+  D3DPERF_BeginEvent
+  D3DPERF_SetOptions
+
+[d3dx9_41.dll] (11 imports)
+  D3DXCreateTexture
+  D3DXCreateVolumeTexture
+  D3DXCreateCubeTexture
+  D3DXCompileShader
+  D3DXGetPixelShaderProfile
+  D3DXGetVertexShaderProfile
+  D3DXLoadVolumeFromMemory
+  D3DXCompileShaderFromFileA
+  D3DXGetShaderConstantTable
+  D3DXSaveSurfaceToFileW
+  D3DXLoadSurfaceFromMemory
+
+[WINHTTP.dll] (12 imports)
+  WinHttpQueryHeaders
+  WinHttpQueryDataAvailable
+  WinHttpReadData
+  WinHttpOpen
+  WinHttpConnect
+  WinHttpOpenRequest
+  WinHttpSetOption
+  WinHttpSendRequest
+  WinHttpWriteData
+  WinHttpReceiveResponse
+  WinHttpCloseHandle
+  WinHttpSetStatusCallback
+
+[iphlpapi.dll] (2 imports)
+  GetIfTable
+  GetIpAddrTable
+
+[COMCTL32.dll] (3 imports)
+  Ordinal #413
+  Ordinal #412
+  Ordinal #410
+
+[DINPUT8.dll] (1 imports)
+  DirectInput8Create
+
+[XINPUT1_3.dll] (3 imports)
+  Ordinal #3
+  Ordinal #5
+  Ordinal #2
+
+[OLEAUT32.dll] (7 imports)
+  Ordinal #2
+  Ordinal #9
+  Ordinal #26
+  Ordinal #12
+  Ordinal #15
+  Ordinal #8
+  Ordinal #6
+

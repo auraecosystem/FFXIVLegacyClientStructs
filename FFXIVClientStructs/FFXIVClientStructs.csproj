@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>FFXIVClientStructs</RootNamespace>
+    <AssemblyName>FFXIVClientStructs</AssemblyName>
+    <Description>Reverse-engineered client structures for FFXIV 1.0 (1.23b) - Crystal Tools Engine</Description>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+</Project>
