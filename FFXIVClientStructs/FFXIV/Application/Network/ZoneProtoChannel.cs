@@ -49,10 +49,15 @@ public unsafe struct ZoneClientPacketBuilder
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public unsafe struct ZoneProtoDownCallback
 {
-    // 199 vfuncs — one handler per server→client zone packet opcode
-    // This is the dispatch table for all incoming zone packets.
-    //
+    // 199 vfuncs — one handler per server→client zone packet opcode.
     // Inherits: ZoneProtoDownCallbackInterface → RecvCallbackInterface
+    //
+    // PM cross-ref (key opcodes → vfunc slot):
+    //   0x00CA AddActor, 0x00CB RemoveActor, 0x00CE SetActorPosition,
+    //   0x00D6 SetActorAppearance, 0x0134 SetActorState, 0x0137 SetActorProperty,
+    //   0x0139 CommandResultX01, 0x013A CommandResultX10, 0x0144 SetActorSubState,
+    //   0x0177 SetActorStatus, 0x0179 SetActorStatusAll
+    // Full enum: see ZoneOpcode in PacketOpcodes.cs
     [FieldOffset(0x00)] public nint VTable; // 0x01128B4C (199 vfuncs)
 }
 

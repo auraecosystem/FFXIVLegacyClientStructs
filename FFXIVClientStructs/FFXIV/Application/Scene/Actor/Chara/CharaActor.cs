@@ -18,6 +18,10 @@ namespace FFXIVClientStructs.FFXIV.Application.Scene.Actor.Chara;
 //
 // 188 vfuncs (largest actor vtable). 55 confirmed fields. 42 embedded sub-objects.
 // Source path: D:\rapture\src\ExternalSdk\cdev\include\CDev/Engine/Fw/SceneObject/Actor.h
+//
+// PM cross-ref: Character → Player/Npc/BattleNpc. CharaWork (stats), BattleTemp (35 params),
+// SubState (breakage/guard/waste/motionPack), ParameterSave (HP[8]/MP/skills/recast[40]),
+// Appearance (28 slots), StatusEffect list. See GameEnums.cs + PacketOpcodes.cs.
 [Rtti(".?AVCharaActor@Chara@Actor@Scene@Application@@")]
 [StructLayout(LayoutKind.Explicit, Size = 0x2BB0)]
 public unsafe struct CharaActor
@@ -41,6 +45,7 @@ public unsafe struct CharaActor
     [FieldOffset(0x0160)] public uint TransformFlags;
 
     // ======================== Visual System ========================
+    // PM: SetActorAppearance (0x00D6) populates 28 AppearanceSlot values here.
     // +0x01BC: sub-object (ctor 0x007A6120) — visual data block A
     [FieldOffset(0x0250)] public nint TextureManager_VTable; // RaptureTextureManager (vt=0x00FB6D94, 703B, 44 fields)
     // +0x035C: sub-object (ctor 0x007A6F70)
@@ -61,12 +66,14 @@ public unsafe struct CharaActor
     [FieldOffset(0x1110)] public nint MccListener2_VTable; // IMccListener (vt=0x00FE7E90)
 
     // ======================== Stats & Attributes ========================
-    [FieldOffset(0x1170)] public uint MainStatParam1; // init 0xED (237)
-    [FieldOffset(0x1174)] public uint MainStatParam2;
-    [FieldOffset(0x1178)] public uint MainStatParam3; // init 0xC9 (201)
-    [FieldOffset(0x117C)] public uint MainStatParam4;
-    [FieldOffset(0x1180)] public uint MainStatParam5;
-    [FieldOffset(0x1184)] public uint MainStatParam6;
+    // PM: BattleTemp.generalParameter[35] + Modifier enum (132 entries).
+    // Init values are property table indices, not stat values.
+    [FieldOffset(0x1170)] public uint StatPropertyId1; // init 0xED (237) — likely stat config index
+    [FieldOffset(0x1174)] public uint StatPropertyId2;
+    [FieldOffset(0x1178)] public uint StatPropertyId3; // init 0xC9 (201) — likely stat config index
+    [FieldOffset(0x117C)] public uint StatPropertyId4;
+    [FieldOffset(0x1180)] public uint StatPropertyId5;
+    [FieldOffset(0x1184)] public uint StatPropertyId6;
     [FieldOffset(0x1188)] public byte StatDirtyFlag;
 
     // ======================== Cutscene System ========================
@@ -76,26 +83,36 @@ public unsafe struct CharaActor
     [FieldOffset(0x11E0)] public float CutSceneTimer;
 
     // ======================== Equipment / Visual State ========================
-    // +0x1200: sub-object (ctor 0x0084A5B0)
-    // +0x1264: sub-object (ctor 0x00849960)
-    // +0x12C8: sub-object (ctor 0x00849870)
+    // PM: 28 appearance slots (AppearanceSlot enum). Equipment sent via
+    // SetActorAppearancePacket (opcode 0x00D6) — slots 5–27 are gear pieces.
+    // +0x1200: sub-object (ctor 0x0084A5B0) — appearance data block
+    // +0x1264: sub-object (ctor 0x00849960) — equipment resolver
+    // +0x12C8: sub-object (ctor 0x00849870) — equipment state tracker
     [FieldOffset(0x12F0)] public uint EquipmentState;
     [FieldOffset(0x12F4)] public nint EquipmentDataPtr;
     // +0x12F8: sub-object (ctor 0x00445CF0) — small helper
     [FieldOffset(0x134C)] public uint VisualUpdateFlags;
 
     // ======================== Target System ========================
+    // PM: SetActorTargetAnimated (0x00D3), SetActorTarget (0x00DB)
     [FieldOffset(0x1354)] public nint TargetInfo_VTable;      // TargetInfo (vt=0x00FA415C, size=0x74)
     [FieldOffset(0x13C8)] public nint FocusTargetInfo_VTable; // TargetInfo (vt=0x00FA415C, size=0x74)
     // +0x143C: sub-object (ctor 0x00855150)
 
     // ======================== Battle / Action System ========================
-    // +0x1530: sub-object (ctor 0x008434C0)
-    // +0x1650: sub-object (ctor 0x00853480)
+    // PM: CommandResultX01 (0x0139), BattleActionX10 (0x013A), BattleActionX18 (0x013B)
+    // +0x1530: sub-object (ctor 0x008434C0) — battle state / command executor
+    // +0x1650: sub-object (ctor 0x00853480) — action queue / recast tracker
 
-    [FieldOffset(0x1690)] public fixed uint StatArray[10]; // 10 dwords, all zero-init
+    // PM: BattleTemp.generalParameter[35] — runtime stat buffer.
+    // Indices: STR=3, VIT=4, DEX=5, INT=6, MND=7, PIE=8,
+    //   Fire/Ice/Wind/Lightning/Earth/Water resist=9–14,
+    //   Acc=15, Eva=16, Atk=17, Def=18, AtkMag=23, HealMag=24,
+    //   MagAcc=27, MagEva=28. See GeneralParameter enum.
+    [FieldOffset(0x1690)] public fixed uint BattleTempStats[10]; // runtime stat cache, zero-init
 
-    // +0x1780: sub-object (ctor 0x0061D050) — large block (~0x9B0 bytes)
+    // +0x1780: sub-object (ctor 0x0061D050) — large block (~0x9B0 bytes), likely ParameterSave region
+    //   PM: ParameterSave = hp[8], hpMax[8], mp, mpMax, 40 recast timers, skill slots
 
     // ======================== Misc Runtime State ========================
     [FieldOffset(0x1950)] public float Field_1950;
@@ -116,6 +133,7 @@ public unsafe struct CharaActor
     // +0x2830: sub-object (ctor 0x007D1400)
 
     // ======================== Action Controller ========================
+    // PM: CommandResultX01/X10/X18 (0x0139–0x013C) dispatched through this controller.
     [FieldOffset(0x2858)] public nint ActionController_VTable; // CharaActionController (vt=0x0103E468)
 
     // ======================== Occlusion ========================
