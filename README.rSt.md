@@ -170,8 +170,31 @@ Platform SDK types outside the engine:
 | **Misc** | 3 | Config, AnyType, NonCopyable |
 
 >> ### Application::Misc (19 structs)
-
+```bash.zsh
 Configuration and support modules: GameConfig, UserConfig, SystemConfig, ResourceConfig (with ConfigChangeEvent), FontModule, LogModule, MacroModule, SoundModule, TextureManager, RaptureSupportModule, StringTable, AsyncWork.
+analyzer --cfg CharaActor
+analyzer --callgraph Renderer
+analyzer --generate cpp
+analyzer --generate rust
+analyzer --generate zig
+analyzer --uml
+analyzer --graph
+analyzer --json
+analyzer --diff old.exe new.exe
+analyzer --plugins
+analyzer --ai
+analyzer --report html
+analyzer --report pdf
+analyzer --sdk
+```
+```rs
+#[repr(C)]
+pub struct CharaActor {
+    pub base: RaptureActor,
+    pub position: Vec3,
+    pub action_controller: CharaActionController,
+}
+```
 
 ### Network Architecture
 Three IPC channels, each with its own connection manager, packet builder, socket thread, and buffer infrastructure:
@@ -215,6 +238,36 @@ Complete extraction of the Lua-exposed client API. 242 RTTI classes under `Appli
 | Nameplate | 3 | 0x72E979–0x72EC19 | `_setNameplateIcon/Gauge/Visible` |
 
 Engine infrastructure: GameEngine (ErrorHandler 68 vfuncs, SharedWorkInterface 28 vfuncs, StackOperator 9 vfuncs), 11 Work::Information types (29 vfuncs each), Memory subsystem (Container 20 vfuncs, Operator 16 vfuncs), 50+ Command::Network packet receivers, 9 Item command types.
+```mm
+class CharaActor : public RaptureActor
+{
+public:
+    virtual void Update();
+    virtual void Draw();
+    virtual void Render();
+
+    float PositionX;
+    float PositionY;
+    float PositionZ;
+
+    CharaActionController ActionController;
+    CharaCutVisualCtrl CutVisualController;
+};
+```
+
+```ini
+kernel32.dll
+
+CreateFileA
+ReadFile
+WriteFile
+
+user32.dll
+
+CreateWindowExA
+DispatchMessage
+PeekMessage
+```
 
 >> ### Analysis Tools
 
@@ -349,6 +402,249 @@ ffxiv_1.0_imports.txt   Import table dump (pre-generated)
 ## Status
 
 This is an **active RE project**. The infrastructure, tools, and RTTI database are complete. Individual struct field mappings are being filled in progressively through static analysis and runtime verification. Contributions welcome — the binary is frozen, so all findings are permanent.
+
+Binary Analysis Framework v2 — Unified Architecture
+
+Vision
+
+Transform the current FFXIVClientStructs project from a game-specific reverse-engineering toolkit into a modular, extensible binary analysis framework capable of analyzing native applications across multiple platforms while preserving the existing FFXIV analysis capabilities.
+
+⸻
+
+Core Components
+
+```pq
+bashBinaryAnalysisFramework
+│
+├── Core
+│   ├── BinaryLoader
+│   ├── MemoryManager
+│   ├── VirtualMemory
+│   ├── PEParser
+│   ├── ELFParser
+│   ├── MachOParser
+│   ├── SymbolDatabase
+│   ├── TypeDatabase
+│   ├── MetadataStore
+│   ├── BinaryCache
+│   └── ProjectManager
+│
+├── Analysis
+│   ├── RTTIAnalyzer
+│   ├── ConstructorAnalyzer
+│   ├── DestructorAnalyzer
+│   ├── VTableAnalyzer
+│   ├── FieldRecovery
+│   ├── TypeInference
+│   ├── ImportAnalyzer
+│   ├── ExportAnalyzer
+│   ├── StringAnalyzer
+│   ├── ResourceAnalyzer
+│   ├── CallGraphAnalyzer
+│   ├── ControlFlowAnalyzer
+│   ├── DataFlowAnalyzer
+│   ├── PatternScanner
+│   ├── SignatureScanner
+│   ├── MemoryLayoutAnalyzer
+│   ├── BinaryDiffer
+│   ├── EngineDetector
+│   ├── ReflectionBuilder
+│   └── SDKBuilder
+│
+├── AI
+│   ├── FunctionClassifier
+│   ├── ClassNameRecovery
+│   ├── FieldNameRecovery
+│   ├── ParameterPrediction
+│   ├── StructureCompletion
+│   ├── DocumentationGenerator
+│   ├── VulnerabilityScanner
+│   ├── PatternRecognition
+│   └── DecompiledCodeAssistant
+│
+├── Generators
+│   ├── CppGenerator
+│   ├── CSharpGenerator
+│   ├── RustGenerator
+│   ├── ZigGenerator
+│   ├── PythonGenerator
+│   ├── GoGenerator
+│   ├── JSONExporter
+│   ├── YAMLExporter
+│   ├── XMLExporter
+│   ├── MarkdownExporter
+│   ├── HTMLExporter
+│   ├── PDFExporter
+│   ├── UMLExporter
+│   └── GraphExporter
+│
+├── Plugins
+│   ├── IDAPro
+│   ├── Ghidra
+│   ├── BinaryNinja
+│   ├── x64dbg
+│   ├── WinDbg
+│   ├── LLDB
+│   └── VisualStudio
+│
+├── Interfaces
+│   ├── CLI
+│   ├── REST API
+│   ├── GUI
+│   ├── Web Dashboard
+│   └── SDK API
+│
+└── Reports
+    ├── HTML
+    ├── Markdown
+    ├── PDF
+    ├── JSON
+    └── XML
+```
+⸻
+
+# Enhanced CLI
+```.q
+analyzer --rtti
+analyzer --imports
+analyzer --exports
+analyzer --vtable
+analyzer --vtfuncs
+analyzer --constructor
+analyzer --destructor
+analyzer --fields
+analyzer --layout
+analyzer --strings
+analyzer --findstr
+analyzer --hierarchy
+analyzer --callgraph
+analyzer --cfg
+analyzer --dataflow
+analyzer --memory
+analyzer --resources
+analyzer --generate cpp
+analyzer --generate csharp
+analyzer --generate rust
+analyzer --generate zig
+analyzer --generate go
+analyzer --generate python
+analyzer --sdk
+analyzer --uml
+analyzer --graph
+analyzer --json
+analyzer --yaml
+analyzer --html
+analyzer --pdf
+analyzer --diff old.exe new.exe
+analyzer --plugins
+analyzer --batch
+analyzer --parallel
+analyzer --ai
+```
+⸻
+
+# AI Capabilities
+
+The AI subsystem should:
+```.wiki
+* Recover probable class names.
+* Infer field names.
+* Predict function signatures.
+* Classify rendering, networking, UI, scripting, and physics systems.
+* Generate documentation.
+* Explain decompiled functions.
+* Detect common software design patterns.
+* Identify likely engine components.
+* Build cross-reference knowledge graphs.
+```
+⸻
+
+# Automatic Code Generation
+
+Supported outputs:
+```xlsl
+* Modern C++
+* C#
+* Rust
+* Go
+* Zig
+* Python
+* JSON
+* YAML
+* XML
+```
+Each generated SDK should include reconstructed classes, inheritance, virtual methods, recovered field layouts, enums, namespaces, comments, and metadata.
+
+⸻
+
+# Interactive Reports
+
+Produce rich reports featuring:
+```pyx
+* Class hierarchy visualization.
+* VTable inspection.
+* Memory layout diagrams.
+* Call graphs.
+* Control-flow graphs.
+* Binary statistics.
+* String cross-references.
+* Import and export summaries.
+* Engine subsystem mapping.
+* Searchable documentation.
+```
+⸻
+
+# Plugin System
+
+Allow third-party extensions for:
+```jq
+* Custom analyzers.
+* Signature databases.
+* Output generators.
+* Game-specific modules.
+* Proprietary engine support.
+* Automation scripts.
+```
+⸻
+
+# Performance
+```cc
+Implement:
+
+* Parallel analysis.
+* Incremental caching.
+* Multi-threaded scanning.
+* Lazy loading.
+* Binary indexing.
+* Memory-mapped file access.
+```
+⸻
+
+# Multi-Platform Support
+
+Support analysis of:
+
+* Windows PE executables and DLLs.
+* Linux ELF binaries.
+* macOS Mach-O binaries.
+* Static libraries.
+* Shared libraries.
+* Executable firmware images.
+
+⸻
+
+# Long-Term Goals
+
+Evolve the framework into a general-purpose binary analysis platform capable of:
+
+* Reverse-engineering native software.
+* Reconstructing SDKs automatically.
+* Producing documentation directly from binaries.
+* Comparing software versions structurally.
+* Assisting reverse engineers with AI-driven analysis.
+* Integrating with major disassemblers and debuggers.
+* Serving as a reusable foundation for research, game modding, software archaeology, compatibility analysis, and binary inspection.
+* 
 
 >> ## Related Projects
 
