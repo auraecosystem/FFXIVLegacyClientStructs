@@ -169,7 +169,7 @@ Platform SDK types outside the engine:
 | **Socket** (existing) | 14 | SocketBase, RUDPImpl, SocketWinsock, Poller |
 | **Misc** | 3 | Config, AnyType, NonCopyable |
 
-### Application::Misc (19 structs)
+>> ### Application::Misc (19 structs)
 
 Configuration and support modules: GameConfig, UserConfig, SystemConfig, ResourceConfig (with ConfigChangeEvent), FontModule, LogModule, MacroModule, SoundModule, TextureManager, RaptureSupportModule, StringTable, AsyncWork.
 
@@ -197,7 +197,7 @@ Server-side field names from [Project Meteor](https://bitbucket.org/Ioncannon/pr
 - **Zone opcodes** (150+) — `AddActor` 0x00CA, `SetPosition` 0x00CE, `SetAppearance` 0x00D6, `SetState` 0x0134, `CommandResult` 0x0139, `SetStatus` 0x0177, etc.
 - **Wire format** — BasePacket (0x10) → SubPacket (0x10) → GameMessage (0x10, opcode at +0x02)
 
-### Lua Script API (166 bindings)
+>> ### Lua Script API (166 bindings)
 Complete extraction of the Lua-exposed client API. 242 RTTI classes under `Application::Lua::Script`, with 109 bindings mapped to exact registration addresses in the 0x00749900–0x00757100 range. Organized into 13 categories:
 
 | Category | Count | Address Range | Key Functions |
@@ -216,11 +216,11 @@ Complete extraction of the Lua-exposed client API. 242 RTTI classes under `Appli
 
 Engine infrastructure: GameEngine (ErrorHandler 68 vfuncs, SharedWorkInterface 28 vfuncs, StackOperator 9 vfuncs), 11 Work::Information types (29 vfuncs each), Memory subsystem (Container 20 vfuncs, Operator 16 vfuncs), 50+ Command::Network packet receivers, 9 Item command types.
 
-### Analysis Tools
+>> ### Analysis Tools
 
 The `FFXIVClientStructs.Tools.CLI` project provides automated analysis directly from the exe:
 
-```
+```.xlsim.ogg
 --rtti              Dump full RTTI database (4,358 classes with inheritance)
 --imports           Dump import table (21 DLLs, ~400 functions)
 --vtable <class>    Dump complete vtable for any RTTI class
@@ -235,7 +235,7 @@ The `FFXIVClientStructs.Tools.CLI` project provides automated analysis directly 
 ```
 
 Examples:
-```
+```.xlsim.q
 dotnet run -- --analyze CharaActor
 
 // Application::Scene::Actor::Chara::CharaActor
@@ -257,7 +257,7 @@ dotnet run -- --analyze CharaActor
 // +0x2B60 CharaCutVisualCtrl (vt=0x0104447C)
 ```
 
-```
+```sw
 dotnet run -- --hierarchy CharaActor
 
 // Inheritance hierarchy for: Application::Scene::Actor::Chara::CharaActor
@@ -270,7 +270,7 @@ dotnet run -- --hierarchy CharaActor
 //   <- SQEX::CDev::Engine::Common::Misc::NonCopyable
 ```
 
-```
+```scss
 dotnet run -- --vtfuncs CharaActor
 
 // Summary: 188 total, 0 pure virtual, 30 stubs
@@ -284,13 +284,13 @@ dotnet run -- --vtfuncs CharaActor
 
 Requires .NET 8.0 SDK.
 
-```bash
+```ps1
 dotnet build --configuration Release
 ```
 
 ## Project Structure
 
-```
+```script.srv.pyx
 FFXIVClientStructs/
   Attributes/         Custom attributes for marking RE data
   Interop/            SignatureScanner, Memory, Pointer<T>, GameInfo
@@ -350,7 +350,7 @@ ffxiv_1.0_imports.txt   Import table dump (pre-generated)
 
 This is an **active RE project**. The infrastructure, tools, and RTTI database are complete. Individual struct field mappings are being filled in progressively through static analysis and runtime verification. Contributions welcome — the binary is frozen, so all findings are permanent.
 
-## Related Projects
+>> ## Related Projects
 
 - [aers/FFXIVClientStructs](https://github.com/aers/FFXIVClientStructs) — Modern FFXIV client structs (completely different engine/architecture)
 - [Seventh Umbral](https://github.com/jpd002/SeventhUmbral) — FFXIV 1.0 server emulator
